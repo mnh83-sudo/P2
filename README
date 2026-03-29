@@ -1,0 +1,25 @@
+Names: Numair Hasan, Darren Chuang
+NetIDs: mnh83, dlc286
+
+Testing Plan:
+- Two identical files: expect JSD of 0.00000
+- Two completely different files: expect JSD of 1.00000
+- "hi there hi there" vs "hi hi out there": expect JSD of 0.39451
+- Directory traversal: confirm .txt files in subdirectories are found.
+- Explicit non-.txt file given as argument: confirm it is included
+- Less than 2 files: confirm error message is printed
+- Unreadable file: confirm perror is called and program continues
+- Three or more files: confirm output is sorted by combined word count descending
+- Run valgrind to check for memory leaks
+
+Design Notes:
+- Word frequency distributions are stored as singly linked lists sorted in
+  lexicographic order. Sorting happens at insert time using strcmp so the
+  lists are always ready for the merge walk.
+- The JSD merge walk simultaneously iterates both sorted word lists in one
+  while loop, handling three cases: word in both files, word only in file 1,
+  word only in file 2.
+- All comparisons are stored in an array of structs and sorted with qsort
+  before printing.
+- File I/O uses POSIX open(), read(), and close().
+- Words are built dynamically with realloc so there is no maximum word length.
